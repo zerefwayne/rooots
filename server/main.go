@@ -1,38 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
-	"database/sql"
-
+	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
-)
-
-const (
-	host     = "localhost"
-	port     = 5432
-	user     = "roootsadmin"
-	password = "roootspw"
-	dbname   = "roootsdb"
+	"github.com/zerefwayne/rooots/server/config"
 )
 
 func main() {
-
-	pqConnectionString := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-
-	log.Println(pqConnectionString)
-
-	db, err := sql.Open("postgres", pqConnectionString)
+	err := godotenv.Load()
 	if err != nil {
-		panic(err)
+		log.Fatal("Error loading .env file")
 	}
-	defer db.Close()
 
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
+	config.SetupDB()
+	config.AutoMigrateDB()
 }
