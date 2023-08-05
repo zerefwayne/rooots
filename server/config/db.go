@@ -15,7 +15,6 @@ var DB *gorm.DB
 var Err error
 
 func SetupDB() {
-
 	host := os.Getenv("DB_POSTGRESQL_HOST")
 	port := os.Getenv("DB_POSTGRESQL_PORT")
 	user := os.Getenv("DB_POSTGRESQL_USER")

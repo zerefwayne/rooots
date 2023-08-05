@@ -1,8 +1,10 @@
 package models
 
+import "github.com/google/uuid"
+
 type User struct {
-	ID        int64  `json:"id"`
-	StravaId  int64  `json:"stravaId"`
-	FirstName string `json:"firstName"`
-	LastName  string `json:"lastName"`
+	Id        uuid.UUID `json:"id"`
+	StravaId  uint64    `json:"stravaId"`
+	FirstName string    `json:"firstName"`
+	LastName  string    `json:"lastName"`
 }

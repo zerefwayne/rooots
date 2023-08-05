@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/http/httputil"
 	"os"
 
 	"github.com/gorilla/mux"
@@ -13,6 +12,8 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/rs/cors"
 	"github.com/zerefwayne/rooots/server/config"
+	"github.com/zerefwayne/rooots/server/models"
+	"github.com/zerefwayne/rooots/server/repository"
 )
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,14 +56,44 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer request.Body.Close()
 
-	resDump, err := httputil.DumpResponse(request, true)
+	var exchangeTokenBody models.ExchangeTokenResponseBody
+
+	err = json.NewDecoder(request.Body).Decode(&exchangeTokenBody)
 	if err != nil {
-		log.Fatal(err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
-	// Prints the exchange response to console
-	fmt.Println(string(resDump))
+	foundUser, err := repository.FindUserByStravaId(config.DB, exchangeTokenBody.Athlete.Id)
+	if err != nil {
+		// Cannot find user
+		newUser, err := repository.CreateUserByStravaLogin(config.DB, &exchangeTokenBody.Athlete)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		jsonResponse, jsonError := json.Marshal(newUser)
+		if jsonError != nil {
+			http.Error(w, jsonError.Error(), http.StatusBadRequest)
+			return
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write(jsonResponse)
+		return
+	}
+
+	jsonResponse, jsonError := json.Marshal(&foundUser)
+	if jsonError != nil {
+		http.Error(w, jsonError.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
+	w.Write(jsonResponse)
 }
 
 func main() {
@@ -77,6 +108,8 @@ func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/auth/strava/login", LoginHandler).Methods("GET")
 	router.HandleFunc("/auth/strava/exchangeToken", ExchangeTokenHandler).Methods("POST")
+
+	router.NotFoundHandler = http.NotFoundHandler()
 
 	handler := cors.Default().Handler(router)
 
