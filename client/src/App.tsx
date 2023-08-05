@@ -1,24 +1,18 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import axios from 'axios';
 
 function App() {
+
+  const handleLogin = () => {
+    axios.get<string>("http://localhost:8081/auth/strava/login").then(({data: redirectUrl}) => {
+      window.location.replace(redirectUrl);
+    }).catch(err => {
+      console.error(err);
+    })
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <button onClick={handleLogin}>Login with Strava</button>
     </div>
   );
 }
