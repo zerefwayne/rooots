@@ -29,17 +29,12 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 
 func FindOrCreateUserByStrava(athlete *models.SummaryAthlete) (*models.User, error) {
 	foundUser, err := repository.FindUserByStravaId(config.DB, athlete.Id)
-
-	log.Printf("Found user: %+v\n", foundUser)
-
 	if err != nil {
 		// Cannot find user
 		createdUser, createUserErr := repository.CreateUserByStravaLogin(config.DB, athlete)
-
-		log.Printf("Found user: %+v\n", createdUser)
-
 		return createdUser, createUserErr
 	}
+
 	return foundUser, err
 }
 
@@ -92,15 +87,27 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jsonResponse, err := json.Marshal(&user)
+	log.Printf("Found User: %+v\n", user)
+
+	jwtString, err := config.GenerateJwtToken(&exchangeTokenBody)
 	if err != nil {
 		HandleHttpError(err, w)
 		return
 	}
 
+	log.Println("GeneratedUserToken:", jwtString)
+
+	ok, err := config.ValidateJwtToken(jwtString)
+	if err != nil {
+		HandleHttpError(err, w)
+		return
+	}
+
+	log.Println("ValidUserToken:", jwtString, ok)
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
+	w.Write([]byte(jwtString))
 }
 
 func main() {
