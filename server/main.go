@@ -27,6 +27,28 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, stravaLoginRedirectUrl)
 }
 
+func FindOrCreateUserByStrava(athlete *models.SummaryAthlete) (*models.User, error) {
+	foundUser, err := repository.FindUserByStravaId(config.DB, athlete.Id)
+
+	log.Printf("Found user: %+v\n", foundUser)
+
+	if err != nil {
+		// Cannot find user
+		createdUser, createUserErr := repository.CreateUserByStravaLogin(config.DB, athlete)
+
+		log.Printf("Found user: %+v\n", createdUser)
+
+		return createdUser, createUserErr
+	}
+	return foundUser, err
+}
+
+func HandleHttpError(err error, w http.ResponseWriter) {
+	fmt.Println("Error: ", err.Error())
+
+	http.Error(w, err.Error(), http.StatusBadRequest)
+}
+
 type ExchangeTokenBody struct {
 	Code string
 }
@@ -38,7 +60,7 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+
 		return
 	}
 
@@ -51,7 +73,7 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	request, err := http.Post(stravaExchangeTokenUri, "application/json", nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleHttpError(err, w)
 		return
 	}
 	defer request.Body.Close()
@@ -60,34 +82,19 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	err = json.NewDecoder(request.Body).Decode(&exchangeTokenBody)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		HandleHttpError(err, w)
 		return
 	}
 
-	foundUser, err := repository.FindUserByStravaId(config.DB, exchangeTokenBody.Athlete.Id)
+	user, err := FindOrCreateUserByStrava(&exchangeTokenBody.Athlete)
 	if err != nil {
-		// Cannot find user
-		newUser, err := repository.CreateUserByStravaLogin(config.DB, &exchangeTokenBody.Athlete)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-
-		jsonResponse, jsonError := json.Marshal(newUser)
-		if jsonError != nil {
-			http.Error(w, jsonError.Error(), http.StatusBadRequest)
-			return
-		}
-
-		w.Header().Set("Content-Type", "application/json")
-		w.WriteHeader(http.StatusOK)
-		w.Write(jsonResponse)
+		HandleHttpError(err, w)
 		return
 	}
 
-	jsonResponse, jsonError := json.Marshal(&foundUser)
-	if jsonError != nil {
-		http.Error(w, jsonError.Error(), http.StatusBadRequest)
+	jsonResponse, err := json.Marshal(&user)
+	if err != nil {
+		HandleHttpError(err, w)
 		return
 	}
 
