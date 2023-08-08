@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/zerefwayne/rooots/server/models"
+	strava "github.com/zerefwayne/rooots/server/models/strava"
 	"gorm.io/gorm"
 )
 
@@ -20,7 +21,7 @@ func FindUserByStravaId(DB *gorm.DB, id uint64) (*models.User, error) {
 	return &foundUser, nil
 }
 
-func CreateUserByStravaLogin(DB *gorm.DB, summaryAthlete *models.SummaryAthlete) (*models.User, error) {
+func CreateUserByStravaLogin(DB *gorm.DB, summaryAthlete *strava.SummaryAthlete) (*models.User, error) {
 	newUser := models.User{
 		Id:        uuid.New(),
 		StravaId:  summaryAthlete.Id,

@@ -9,10 +9,11 @@ import (
 
 	"github.com/zerefwayne/rooots/server/config"
 	"github.com/zerefwayne/rooots/server/models"
+	strava "github.com/zerefwayne/rooots/server/models/strava"
 	"github.com/zerefwayne/rooots/server/repository"
 )
 
-func FindOrCreateUserByStrava(athlete *models.SummaryAthlete) (*models.User, error) {
+func FindOrCreateUserByStrava(athlete *strava.SummaryAthlete) (*models.User, error) {
 	foundUser, err := repository.FindUserByStravaId(config.DB, athlete.Id)
 	if err != nil {
 		// Cannot find user
@@ -58,7 +59,7 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	defer request.Body.Close()
 
-	var exchangeTokenBody models.ExchangeTokenResponseBody
+	var exchangeTokenBody strava.ExchangeTokenResponseBody
 
 	err = json.NewDecoder(request.Body).Decode(&exchangeTokenBody)
 	if err != nil {
@@ -101,4 +102,15 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(jsonResponse)
+}
+
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	STRAVA_CLIENT_ID := os.Getenv("STRAVA_CLIENT_ID")
+	STRAVA_REDIRECT_URI := os.Getenv("STRAVA_REDIRECT_URI")
+	STRAVA_SCOPE := os.Getenv("STRAVA_SCOPE")
+
+	stravaLoginRedirectUrl := fmt.Sprintf("https://www.strava.com/oauth/authorize?client_id=%s&response_type=code&redirect_uri=%s&approval_prompt=force&scope=%s", STRAVA_CLIENT_ID, STRAVA_REDIRECT_URI, STRAVA_SCOPE)
+
+	w.WriteHeader(http.StatusOK)
+	fmt.Fprint(w, stravaLoginRedirectUrl)
 }

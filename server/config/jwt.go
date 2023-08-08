@@ -4,12 +4,12 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/zerefwayne/rooots/server/models"
+	strava "github.com/zerefwayne/rooots/server/models/strava"
 )
 
 var mySigningKey = []byte("AllYourBase")
 
-func GenerateJwtToken(oauthResponse *models.ExchangeTokenResponseBody) (string, error) {
+func GenerateJwtToken(oauthResponse *strava.ExchangeTokenResponseBody) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"access_token":  oauthResponse.AccessToken,
 		"refresh_token": oauthResponse.RefreshToken,
