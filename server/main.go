@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -48,6 +49,10 @@ type ExchangeTokenBody struct {
 	Code string
 }
 
+type LoginSuccessResponse struct {
+	AuthenticationToken string `json:"authenticationToken"`
+}
+
 func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Exchange token requested!")
 
@@ -81,6 +86,12 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if exchangeTokenBody.TokenType == "" {
+		// Strava token request failed
+		HandleHttpError(errors.New("invalid request"), w)
+		return
+	}
+
 	user, err := FindOrCreateUserByStrava(&exchangeTokenBody.Athlete)
 	if err != nil {
 		HandleHttpError(err, w)
@@ -105,9 +116,17 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("ValidUserToken:", jwtString, ok)
 
+	authToken := LoginSuccessResponse{AuthenticationToken: jwtString}
+
+	jsonResponse, err := json.Marshal(&authToken)
+	if err != nil {
+		HandleHttpError(err, w)
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(jwtString))
+	w.Write(jsonResponse)
 }
 
 func main() {
