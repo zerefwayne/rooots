@@ -9,7 +9,6 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
-	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
 	"github.com/rs/cors"
 	"github.com/zerefwayne/rooots/server/config"
@@ -120,13 +119,15 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
+	log.Println("server	|	initializing")
 
-	config.SetupDB()
-	config.AutoMigrateDB()
+	config.LoadEnvVariables()
+
+	config.ConnectDB()
+	defer config.CloseDB()
+
+	config.PingDB()
+	config.AutoMigrateModels()
 
 	router := mux.NewRouter()
 	router.HandleFunc("/auth/strava/login", LoginHandler).Methods("GET")
