@@ -2,7 +2,6 @@ package config
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/zerefwayne/rooots/server/models"
@@ -34,11 +33,8 @@ func ValidateJwtToken(tokenStr string) (bool, error) {
 		return false, err
 	}
 
-	log.Printf("DECONSTRUCTED TOKEN: %+v\n", token)
-
-	claims, ok := token.Claims.(*MyCustomClaims)
+	_, ok := token.Claims.(*MyCustomClaims)
 	if ok && token.Valid {
-		log.Printf("VALID TOKEN. CLAIMS: %+v\n", claims)
 		return true, nil
 	}
 

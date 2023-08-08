@@ -41,7 +41,6 @@ func FindOrCreateUserByStrava(athlete *models.SummaryAthlete) (*models.User, err
 
 func HandleHttpError(err error, w http.ResponseWriter) {
 	fmt.Println("Error: ", err.Error())
-
 	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
@@ -50,21 +49,18 @@ type ExchangeTokenBody struct {
 }
 
 type LoginSuccessResponse struct {
-	AuthenticationToken string `json:"authenticationToken"`
+	AuthenticationToken string       `json:"authenticationToken"`
+	User                *models.User `json:"user"`
 }
 
 func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
-	log.Println("Exchange token requested!")
-
 	var body ExchangeTokenBody
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
-
+		HandleHttpError(err, w)
 		return
 	}
-
-	log.Printf("Authentication code is: %s\n", body.Code)
 
 	STRAVA_CLIENT_ID := os.Getenv("STRAVA_CLIENT_ID")
 	STRAVA_CLIENT_SECRET := os.Getenv("STRAVA_CLIENT_SECRET")
@@ -98,25 +94,19 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Printf("Found User: %+v\n", user)
-
 	jwtString, err := config.GenerateJwtToken(&exchangeTokenBody)
 	if err != nil {
 		HandleHttpError(err, w)
 		return
 	}
 
-	log.Println("GeneratedUserToken:", jwtString)
-
-	ok, err := config.ValidateJwtToken(jwtString)
+	_, err = config.ValidateJwtToken(jwtString)
 	if err != nil {
 		HandleHttpError(err, w)
 		return
 	}
 
-	log.Println("ValidUserToken:", jwtString, ok)
-
-	authToken := LoginSuccessResponse{AuthenticationToken: jwtString}
+	authToken := LoginSuccessResponse{AuthenticationToken: jwtString, User: user}
 
 	jsonResponse, err := json.Marshal(&authToken)
 	if err != nil {
