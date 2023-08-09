@@ -5,7 +5,7 @@ interface ExchangeTokenResponse {
     authenticationToken: string
 }
 
-function StravaLoading() {
+export function StravaLoading() {
     const params = new URLSearchParams(window.location.search);
     const code = params.get("code");
     const [authenticationToken, setAuthenticationToken] = useState('');
@@ -17,6 +17,7 @@ function StravaLoading() {
                 setAuthenticationToken(data.authenticationToken || '');
                 if (!data.authenticationToken) return
                 sessionStorage.setItem("authentication_token", data.authenticationToken)
+                window.location.href = '/';
             } catch (err) {
                 console.error(err)
             }
@@ -34,5 +35,3 @@ function StravaLoading() {
     )
 
 }
-
-export default StravaLoading

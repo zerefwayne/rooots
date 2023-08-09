@@ -1,21 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
+import { App } from './app';
 import reportWebVitals from './reportWebVitals';
-import { RouterProvider, createBrowserRouter } from 'react-router-dom';
-import StravaLoading from './StravaLoading';
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <App />,
-  },
-  {
-    path: "/auth/strava/callback",
-    element: <StravaLoading />
-  }
-]);
 
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
@@ -23,7 +9,7 @@ const root = ReactDOM.createRoot(
 
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <App />
   </React.StrictMode>
 );
 
