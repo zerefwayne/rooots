@@ -1,11 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	_ "github.com/lib/pq"
-	"github.com/rs/cors"
 	"github.com/zerefwayne/rooots/server/config"
 	"github.com/zerefwayne/rooots/server/routes"
 )
@@ -19,12 +20,11 @@ func main() {
 	config.AutoMigrateModels()
 
 	r := routes.NewRouter()
+	handler := routes.NewCorsConfiguration().Handler(r)
 
-	handler := cors.Default().Handler(r)
-
-	if err := http.ListenAndServe(":8081", handler); err != nil {
+	port := fmt.Sprintf(":%s", os.Getenv("APPLICATION_PORT"))
+	log.Printf("server	listening on port %s\n", port)
+	if err := http.ListenAndServe(port, handler); err != nil {
 		log.Fatalln(err)
-	} else {
-		log.Println("server	listening on port :8081")
 	}
 }
