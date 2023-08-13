@@ -9,14 +9,13 @@ import (
 	"time"
 
 	"github.com/zerefwayne/rooots/server/config"
-	"github.com/zerefwayne/rooots/server/dto"
-	strava "github.com/zerefwayne/rooots/server/dto/strava"
+	"github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/repository"
 	"github.com/zerefwayne/rooots/server/utils"
 )
 
 func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
-	var body dto.ExchangeTokenBody
+	var body strava.ExchangeTokenBody
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -56,7 +55,7 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loginResponse := dto.LoginSuccessResponse{
+	loginResponse := strava.LoginSuccessResponse{
 		AccessToken: exchangeTokenBody.AccessToken,
 		Name:        fmt.Sprintf("%s %s", user.FirstName, user.LastName),
 	}

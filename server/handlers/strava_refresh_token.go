@@ -9,7 +9,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/zerefwayne/rooots/server/dto"
 	strava "github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/utils"
 )
@@ -50,7 +49,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	loginResponse := dto.LoginSuccessResponse{
+	loginResponse := strava.LoginSuccessResponse{
 		AccessToken: exchangeTokenBody.AccessToken,
 	}
 

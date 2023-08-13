@@ -8,3 +8,12 @@ type ExchangeTokenResponseBody struct {
 	AccessToken  string         `json:"access_token"`
 	Athlete      SummaryAthlete `json:"athlete"`
 }
+
+type ExchangeTokenBody struct {
+	Code string
+}
+
+type LoginSuccessResponse struct {
+	AccessToken string `json:"accessToken"`
+	Name        string `json:"name"`
+}
