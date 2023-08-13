@@ -6,7 +6,7 @@ import (
 )
 
 func LoadStravaAuthRoutes(r *mux.Router) {
-	r.HandleFunc("/auth/strava/login", handlers.LoginHandler).Methods("GET")
+	r.HandleFunc("/auth/strava/login", handlers.StravaLoginHandler).Methods("GET")
 	r.HandleFunc("/auth/strava/exchangeToken", handlers.ExchangeTokenHandler).Methods("POST")
 	r.HandleFunc("/auth/strava/refreshToken", handlers.RefreshTokenHandler).Methods("GET")
 }

@@ -12,7 +12,6 @@ import (
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-
 	accessToken := r.Header.Get("Authorization")
 
 	if accessToken == "" {
@@ -23,7 +22,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Accessing strava data with accessToken", accessToken)
 
-	stravaId := 40168617
+	stravaId := 40168617 // TODO Send from client
 
 	stravaRequestUri := fmt.Sprintf("https://www.strava.com/api/v3/athletes/%d/stats", stravaId)
 

@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func StravaLoginHandler(w http.ResponseWriter, r *http.Request) {
 	STRAVA_CLIENT_ID := os.Getenv("STRAVA_CLIENT_ID")
 	STRAVA_REDIRECT_URI := os.Getenv("STRAVA_REDIRECT_URI")
 	STRAVA_SCOPE := os.Getenv("STRAVA_SCOPE")

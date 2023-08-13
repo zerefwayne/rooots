@@ -1,32 +1,34 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"time"
 
+	"github.com/zerefwayne/rooots/server/config"
 	strava "github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/utils"
 )
 
+func getStravaRefreshTokenUri(refreshToken string) string {
+	STRAVA_CLIENT_ID := os.Getenv("STRAVA_CLIENT_ID")
+	STRAVA_CLIENT_SECRET := os.Getenv("STRAVA_CLIENT_SECRET")
+
+	grantType := "refresh_token"
+
+	return fmt.Sprintf("https://www.strava.com/api/v3/oauth/token?client_id=%s&client_secret=%s&refresh_token=%s&grant_type=%s", STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, refreshToken, grantType)
+}
+
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	cookie, err := r.Cookie("refreshTokenCookie")
+	refreshTokenCookie, err := r.Cookie(config.REFRESH_TOKEN_COOKIE_NAME)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return
 	}
 
-	log.Printf("REFRESH TOKEN recieved from client: %+v\n", cookie)
-
-	STRAVA_CLIENT_ID := os.Getenv("STRAVA_CLIENT_ID")
-	STRAVA_CLIENT_SECRET := os.Getenv("STRAVA_CLIENT_SECRET")
-	refreshToken := cookie.Value
-
-	stravaRefreshTokenUri := fmt.Sprintf("https://www.strava.com/api/v3/oauth/token?client_id=%s&client_secret=%s&grant_type=refresh_token&refresh_token=%s", STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, refreshToken)
+	stravaRefreshTokenUri := getStravaRefreshTokenUri(refreshTokenCookie.Value)
 
 	request, err := http.Post(stravaRefreshTokenUri, "application/json", nil)
 	if err != nil {
@@ -36,43 +38,26 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	defer request.Body.Close()
 
 	var exchangeTokenBody strava.ExchangeTokenResponseBody
-
-	err = json.NewDecoder(request.Body).Decode(&exchangeTokenBody)
+	err = utils.DecodeJson(request.Body, &exchangeTokenBody)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return
 	}
 
-	if exchangeTokenBody.TokenType == "" {
-		// Strava token request failed
+	if isInvalidExchangeTokenBody(&exchangeTokenBody) {
 		utils.HandleHttpError(errors.New("invalid request"), w)
 		return
 	}
+
+	newCookie := utils.GetCookie(config.REFRESH_TOKEN_COOKIE_NAME, exchangeTokenBody.RefreshToken, time.Unix(exchangeTokenBody.ExpiresAt, 0))
+	http.SetCookie(w, newCookie)
 
 	loginResponse := strava.LoginSuccessResponse{
 		AccessToken: exchangeTokenBody.AccessToken,
 	}
 
-	newCookie := http.Cookie{
-		Name:     "refreshTokenCookie",
-		Value:    exchangeTokenBody.RefreshToken,
-		Expires:  time.Unix(exchangeTokenBody.ExpiresAt, 0),
-		Secure:   false,
-		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
-		Path:     "/",
-	}
-
-	fmt.Printf("NEW COOKIE BEING SET %+v\n", &newCookie)
-	http.SetCookie(w, &newCookie)
-
-	jsonResponse, err := json.Marshal(&loginResponse)
-	if err != nil {
+	if err := utils.RespondWithJson(w, loginResponse, http.StatusOK); err != nil {
 		utils.HandleHttpError(err, w)
 		return
 	}
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	w.Write(jsonResponse)
 }
