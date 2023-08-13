@@ -56,18 +56,6 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	jwtString, err := config.GenerateJwtToken(&exchangeTokenBody)
-	if err != nil {
-		utils.HandleHttpError(err, w)
-		return
-	}
-
-	_, err = config.ValidateJwtToken(jwtString)
-	if err != nil {
-		utils.HandleHttpError(err, w)
-		return
-	}
-
 	loginResponse := dto.LoginSuccessResponse{
 		AccessToken: exchangeTokenBody.AccessToken,
 		Name:        fmt.Sprintf("%s %s", user.FirstName, user.LastName),
