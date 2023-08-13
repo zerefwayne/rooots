@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/golang-jwt/jwt/v5"
-	strava "github.com/zerefwayne/rooots/server/models/strava"
+	strava "github.com/zerefwayne/rooots/server/dto/strava"
 )
 
 var mySigningKey = []byte("AllYourBase")

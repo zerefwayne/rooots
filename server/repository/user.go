@@ -4,8 +4,8 @@ import (
 	"log"
 
 	"github.com/google/uuid"
+	strava "github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/models"
-	strava "github.com/zerefwayne/rooots/server/models/strava"
 	"gorm.io/gorm"
 )
 
@@ -35,4 +35,15 @@ func CreateUserByStravaLogin(DB *gorm.DB, summaryAthlete *strava.SummaryAthlete)
 	}
 
 	return &newUser, nil
+}
+
+func FindOrCreateUserByStrava(DB *gorm.DB, athlete *strava.SummaryAthlete) (*models.User, error) {
+	foundUser, err := FindUserByStravaId(DB, athlete.Id)
+	if err != nil {
+		// Cannot find user
+		createdUser, createUserErr := CreateUserByStravaLogin(DB, athlete)
+		return createdUser, createUserErr
+	}
+
+	return foundUser, err
 }

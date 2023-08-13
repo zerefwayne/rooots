@@ -1,4 +1,4 @@
-package models
+package strava
 
 import (
 	"time"
