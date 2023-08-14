@@ -1,8 +1,6 @@
 package repository
 
 import (
-	"log"
-
 	"github.com/google/uuid"
 	strava "github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/models"
@@ -14,7 +12,6 @@ func FindUserById(DB *gorm.DB, id uuid.UUID) (*models.User, error) {
 
 	result := DB.Model(&models.User{}).Where(&models.User{Id: id}).First(&foundUser)
 	if result.Error != nil {
-		log.Println(result.Error.Error())
 		return nil, result.Error
 	}
 
@@ -26,7 +23,6 @@ func FindUserByStravaId(DB *gorm.DB, id uint64) (*models.User, error) {
 
 	result := DB.Model(&models.User{}).Where(&models.User{StravaId: id}).First(&foundUser)
 	if result.Error != nil {
-		log.Println(result.Error.Error())
 		return nil, result.Error
 	}
 

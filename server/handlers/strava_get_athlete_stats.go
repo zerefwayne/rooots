@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -18,20 +17,13 @@ import (
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	accessToken := r.Header.Get("Authorization")
 	vars := mux.Vars(r)
-
 	userId := vars["id"]
-	log.Println("VARS[userId]", userId)
-
 	userIdUuid, err := uuid.Parse(userId)
-	log.Println("userUuid", userIdUuid)
 
 	if err != nil || accessToken == "" || userId == "" {
-		log.Println("Unauthorized!")
 		w.WriteHeader(http.StatusUnauthorized)
 		return
 	}
-
-	log.Println("Accessing strava data with accessToken", accessToken)
 
 	user, err := repository.FindUserById(config.DB, userIdUuid)
 	if err != nil {
@@ -60,10 +52,10 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	bodyBytes, err := io.ReadAll(resp.Body)
 	if err != nil {
-		log.Fatal(err)
+		utils.HandleHttpError(err, w)
+		return
 	}
 	bodyString := string(bodyBytes)
-	log.Println(bodyString)
 
 	var responseObject strava.ActivityStats
 
