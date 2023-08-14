@@ -19,7 +19,7 @@ const StravaLoading = () => {
         const handleLoginWithStrava = async () => {
             try {
                 const { data } = await axios.post<ExchangeTokenResponse>(
-                    '/auth/strava/exchangeToken', { code })
+                    '/auth/strava/exchangeToken', { code }, {withCredentials: true})
                 console.log(data);
 
                 const accessToken = data?.accessToken;
