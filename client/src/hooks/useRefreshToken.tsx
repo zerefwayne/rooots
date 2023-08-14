@@ -5,6 +5,7 @@ import useAuth from "./useAuth";
 interface RefreshSuccessResponse {
     accessToken: string
     expiresAt: Date
+    userId: string
 }
 
 const useRefreshToken = () => {
@@ -20,7 +21,8 @@ const useRefreshToken = () => {
                 if (response.data.accessToken) {
                     console.log("PREVIOUS STATE", JSON.stringify(auth));
                     console.log(response.data.accessToken);
-                    return { ...auth, accessToken: response.data.accessToken }
+                    console.log(response.data.userId);
+                    return { ...auth, accessToken: response.data.accessToken, userId: response.data.userId }
                 } else {
                     console.log("Nothing to change in setAuth");
                     return auth

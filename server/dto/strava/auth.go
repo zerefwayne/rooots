@@ -1,5 +1,7 @@
 package strava
 
+import "github.com/google/uuid"
+
 type ExchangeTokenResponseBody struct {
 	TokenType    string         `json:"token_type"`
 	ExpiresAt    int64          `json:"expires_at"`
@@ -14,6 +16,7 @@ type ExchangeTokenBody struct {
 }
 
 type LoginSuccessResponse struct {
-	AccessToken string `json:"accessToken"`
-	Name        string `json:"name"`
+	AccessToken string    `json:"accessToken"`
+	Name        string    `json:"name"`
+	UserId      uuid.UUID `json:"userId"`
 }

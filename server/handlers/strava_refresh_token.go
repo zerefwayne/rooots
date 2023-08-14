@@ -9,6 +9,7 @@ import (
 
 	"github.com/zerefwayne/rooots/server/config"
 	strava "github.com/zerefwayne/rooots/server/dto/strava"
+	"github.com/zerefwayne/rooots/server/repository"
 	"github.com/zerefwayne/rooots/server/utils"
 )
 
@@ -49,11 +50,17 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	user, err := repository.FindUserByStravaId(config.DB, exchangeTokenBody.Athlete.Id)
+	if err != nil {
+		utils.HandleHttpError(err, w)
+	}
+
 	newCookie := utils.GetCookie(config.REFRESH_TOKEN_COOKIE_NAME, exchangeTokenBody.RefreshToken, time.Unix(exchangeTokenBody.ExpiresAt, 0))
 	http.SetCookie(w, newCookie)
 
 	loginResponse := strava.LoginSuccessResponse{
 		AccessToken: exchangeTokenBody.AccessToken,
+		UserId:      user.Id,
 	}
 
 	if err := utils.RespondWithJson(w, loginResponse, http.StatusOK); err != nil {

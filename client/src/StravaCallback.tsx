@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 interface ExchangeTokenResponse {
     accessToken: string
     name: string
+    userId: string
 }
 
 const StravaLoading = () => {
@@ -23,8 +24,9 @@ const StravaLoading = () => {
 
                 const accessToken = data?.accessToken;
                 const name = data?.name;
+                const userId = data?.userId;
 
-                setAuth && setAuth({ accessToken, name });
+                setAuth && setAuth({ accessToken, name, userId });
                 navigate('/');
             } catch (err) {
                 console.error(err)

@@ -2,19 +2,24 @@ import { useEffect, useState } from "react";
 import useRefreshToken from "./hooks/useRefreshToken";
 import { Button } from "antd";
 import useAxiosPrivate from "./hooks/useAxiosPrivate";
+import useAuth from "./hooks/useAuth";
 
 const User = () => {
     const [user, setUser] = useState();
     const refreshToken = useRefreshToken();
     const axiosPrivate = useAxiosPrivate();
+    const { auth } = useAuth();
 
     useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
 
+        const userId = auth?.userId;
+        console.log(userId);
+
         const getUser = async () => {
             try {
-                const response = await axiosPrivate.get("/strava/user", { signal: controller.signal });
+                const response = await axiosPrivate.get(`/strava/${userId}/user`, { signal: controller.signal });
                 console.log(response.data);
 
                 isMounted && setUser(response.data);
@@ -23,7 +28,9 @@ const User = () => {
             }
         }
 
-        getUser();
+        if (userId) {
+            getUser();
+        }
 
         return () => {
             isMounted = false;

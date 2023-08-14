@@ -66,6 +66,7 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 	loginResponse := strava.LoginSuccessResponse{
 		AccessToken: exchangeTokenBody.AccessToken,
 		Name:        fmt.Sprintf("%s %s", user.FirstName, user.LastName),
+		UserId:      user.Id,
 	}
 
 	if err := utils.RespondWithJson(w, loginResponse, http.StatusOK); err != nil {

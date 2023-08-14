@@ -9,6 +9,18 @@ import (
 	"gorm.io/gorm"
 )
 
+func FindUserById(DB *gorm.DB, id uuid.UUID) (*models.User, error) {
+	var foundUser models.User
+
+	result := DB.Model(&models.User{}).Where(&models.User{Id: id}).First(&foundUser)
+	if result.Error != nil {
+		log.Println(result.Error.Error())
+		return nil, result.Error
+	}
+
+	return &foundUser, nil
+}
+
 func FindUserByStravaId(DB *gorm.DB, id uint64) (*models.User, error) {
 	var foundUser models.User
 

@@ -1,8 +1,10 @@
+
 import { createContext, useState } from "react";
 
 export interface Auth {
     accessToken?: string
     name?: string
+    userId?: string
 }
 
 const AuthContext = createContext<{
