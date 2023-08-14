@@ -25,6 +25,18 @@ func GetCookie(name string, value string, expires time.Time) *http.Cookie {
 	}
 }
 
+func RemoveCookie(cookie *http.Cookie) *http.Cookie {
+	return &http.Cookie{
+		Name:     cookie.Name,
+		Value:    cookie.Name,
+		MaxAge:   -1,
+		Secure:   false,
+		HttpOnly: true,
+		SameSite: http.SameSiteLaxMode,
+		Path:     "/",
+	}
+}
+
 func DecodeJson(source io.ReadCloser, v interface{}) error {
 	return json.NewDecoder(source).Decode(v)
 }

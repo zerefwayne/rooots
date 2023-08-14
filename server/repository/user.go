@@ -33,12 +33,13 @@ func FindUserByStravaId(DB *gorm.DB, id uint64) (*models.User, error) {
 	return &foundUser, nil
 }
 
-func CreateUserByStravaLogin(DB *gorm.DB, summaryAthlete *strava.SummaryAthlete) (*models.User, error) {
+func CreateUserByStravaLogin(DB *gorm.DB, exchangeTokenBody *strava.ExchangeTokenResponseBody) (*models.User, error) {
 	newUser := models.User{
-		Id:        uuid.New(),
-		StravaId:  summaryAthlete.Id,
-		FirstName: summaryAthlete.FirstName,
-		LastName:  summaryAthlete.LastName,
+		Id:           uuid.New(),
+		StravaId:     exchangeTokenBody.Athlete.Id,
+		FirstName:    exchangeTokenBody.Athlete.FirstName,
+		LastName:     exchangeTokenBody.Athlete.LastName,
+		RefreshToken: exchangeTokenBody.RefreshToken,
 	}
 
 	result := DB.Model(&models.User{}).Create(&newUser)
@@ -49,13 +50,23 @@ func CreateUserByStravaLogin(DB *gorm.DB, summaryAthlete *strava.SummaryAthlete)
 	return &newUser, nil
 }
 
-func FindOrCreateUserByStrava(DB *gorm.DB, athlete *strava.SummaryAthlete) (*models.User, error) {
-	foundUser, err := FindUserByStravaId(DB, athlete.Id)
+func FindOrCreateUserByStrava(DB *gorm.DB, exchangeTokenBody *strava.ExchangeTokenResponseBody) (*models.User, error) {
+	foundUser, err := FindUserByStravaId(DB, exchangeTokenBody.Athlete.Id)
 	if err != nil {
 		// Cannot find user
-		createdUser, createUserErr := CreateUserByStravaLogin(DB, athlete)
+		createdUser, createUserErr := CreateUserByStravaLogin(DB, exchangeTokenBody)
 		return createdUser, createUserErr
 	}
 
 	return foundUser, err
+}
+
+func UpdateRefreshToken(DB *gorm.DB, oldRefreshToken string, newRefreshToken string) (*models.User, error) {
+	var foundUser models.User
+	if result := DB.Model(&models.User{}).Where(&models.User{RefreshToken: oldRefreshToken}).First(&foundUser); result.Error != nil {
+		return nil, result.Error
+	}
+	foundUser.RefreshToken = newRefreshToken
+	DB.Save(foundUser)
+	return &foundUser, nil
 }

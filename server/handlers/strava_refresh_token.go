@@ -50,9 +50,10 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := repository.FindUserByStravaId(config.DB, exchangeTokenBody.Athlete.Id)
+	user, err := repository.UpdateRefreshToken(config.DB, refreshTokenCookie.Value, exchangeTokenBody.RefreshToken)
 	if err != nil {
 		utils.HandleHttpError(err, w)
+		return
 	}
 
 	newCookie := utils.GetCookie(config.REFRESH_TOKEN_COOKIE_NAME, exchangeTokenBody.RefreshToken, time.Unix(exchangeTokenBody.ExpiresAt, 0))

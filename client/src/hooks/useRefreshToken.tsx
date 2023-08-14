@@ -20,8 +20,7 @@ const useRefreshToken = () => {
             setAuth && setAuth((auth: Auth) => {
                 if (response.data.accessToken) {
                     console.log("PREVIOUS STATE", JSON.stringify(auth));
-                    console.log(response.data.accessToken);
-                    console.log(response.data.userId);
+                    console.log(response.data);
                     return { ...auth, accessToken: response.data.accessToken, userId: response.data.userId }
                 } else {
                     console.log("Nothing to change in setAuth");

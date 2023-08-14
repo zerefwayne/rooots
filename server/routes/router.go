@@ -13,6 +13,7 @@ func NewRouter() *mux.Router {
 
 	LoadStravaAuthRoutes(r)
 	LoadStravaApiRoutes(r)
+	LoadAuthRoutes(r)
 
 	r.NotFoundHandler = http.NotFoundHandler()
 

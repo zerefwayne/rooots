@@ -54,7 +54,7 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := repository.FindOrCreateUserByStrava(config.DB, &exchangeTokenBody.Athlete)
+	user, err := repository.FindOrCreateUserByStrava(config.DB, &exchangeTokenBody)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return

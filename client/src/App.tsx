@@ -4,6 +4,7 @@ import Login from './Login';
 import StravaLoading from './StravaCallback';
 import RequireAuth from './components/RequireAuth';
 import Home from './Home';
+import PersistentLogin from './components/PersistLogin';
 
 const App = () => {
     return (
@@ -12,8 +13,10 @@ const App = () => {
                 <Route path="login" element={<Login />} />
                 <Route path="auth/strava/callback" element={<StravaLoading />} />
 
-                <Route element={<RequireAuth />}>
-                    <Route path="" element={<Home />} />
+                <Route element={<PersistentLogin />}>
+                    <Route element={<RequireAuth />}>
+                        <Route path="" element={<Home />} />
+                    </Route>
                 </Route>
             </Route>
         </Routes>
