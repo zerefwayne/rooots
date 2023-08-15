@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/zerefwayne/rooots/server/config"
+	"github.com/zerefwayne/rooots/server/constants"
 	strava "github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/repository"
 	"github.com/zerefwayne/rooots/server/utils"
@@ -23,7 +24,7 @@ func getStravaRefreshTokenUri(refreshToken string) string {
 }
 
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	refreshTokenCookie, err := r.Cookie(config.REFRESH_TOKEN_COOKIE_NAME)
+	refreshTokenCookie, err := r.Cookie(constants.REFRESH_TOKEN_COOKIE_NAME)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return
@@ -68,7 +69,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newCookie := utils.GetCookie(config.REFRESH_TOKEN_COOKIE_NAME, cookieContent, time.Unix(exchangeTokenBody.ExpiresAt, 0))
+	newCookie := utils.GetCookie(constants.REFRESH_TOKEN_COOKIE_NAME, cookieContent, time.Unix(exchangeTokenBody.ExpiresAt, 0))
 	http.SetCookie(w, newCookie)
 
 	loginResponse := strava.LoginSuccessResponse{

@@ -8,13 +8,14 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/zerefwayne/rooots/server/config"
+	"github.com/zerefwayne/rooots/server/constants"
 	"github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/repository"
 	"github.com/zerefwayne/rooots/server/utils"
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	jwtCookie, err := r.Cookie(config.REFRESH_TOKEN_COOKIE_NAME)
+	jwtCookie, err := r.Cookie(constants.REFRESH_TOKEN_COOKIE_NAME)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return
@@ -31,14 +32,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	userId := jwtClaims.UserId
 
 	accessToken := r.Header.Get("Authorization")
-	// vars := mux.Vars(r)
-	// userId := vars["id"]
 	userIdUuid, err := uuid.Parse(userId)
 
-	// if err != nil || accessToken == "" || userId == "" {
-	// 	w.WriteHeader(http.StatusUnauthorized)
-	// 	return
-	// }
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return
