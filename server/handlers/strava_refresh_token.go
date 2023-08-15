@@ -10,6 +10,7 @@ import (
 	"github.com/zerefwayne/rooots/server/config"
 	"github.com/zerefwayne/rooots/server/constants"
 	strava "github.com/zerefwayne/rooots/server/dto/strava"
+	"github.com/zerefwayne/rooots/server/middleware"
 	"github.com/zerefwayne/rooots/server/repository"
 	"github.com/zerefwayne/rooots/server/utils"
 )
@@ -24,19 +25,9 @@ func getStravaRefreshTokenUri(refreshToken string) string {
 }
 
 func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
-	refreshTokenCookie, err := r.Cookie(constants.REFRESH_TOKEN_COOKIE_NAME)
-	if err != nil {
-		utils.HandleHttpError(err, w)
-		return
-	}
+	authData := r.Context().Value(middleware.AuthorizationContextKey{}).(*middleware.AuthorizationData)
 
-	isValid, jwtClaims, err := utils.ValidateJwtToken(refreshTokenCookie.Value)
-	if !isValid {
-		utils.HandleHttpError(err, w)
-		return
-	}
-
-	stravaRefreshTokenUri := getStravaRefreshTokenUri(jwtClaims.RefreshToken)
+	stravaRefreshTokenUri := getStravaRefreshTokenUri(authData.RefreshToken)
 
 	request, err := http.Post(stravaRefreshTokenUri, "application/json", nil)
 	if err != nil {
@@ -57,7 +48,7 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := repository.UpdateRefreshToken(config.DB, jwtClaims.RefreshToken, exchangeTokenBody.RefreshToken)
+	user, err := repository.UpdateRefreshToken(config.DB, authData.RefreshToken, exchangeTokenBody.RefreshToken)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return

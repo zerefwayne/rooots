@@ -6,40 +6,21 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/google/uuid"
 	"github.com/zerefwayne/rooots/server/config"
-	"github.com/zerefwayne/rooots/server/constants"
 	"github.com/zerefwayne/rooots/server/dto/strava"
+	"github.com/zerefwayne/rooots/server/middleware"
 	"github.com/zerefwayne/rooots/server/repository"
 	"github.com/zerefwayne/rooots/server/utils"
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
-	jwtCookie, err := r.Cookie(constants.REFRESH_TOKEN_COOKIE_NAME)
-	if err != nil {
-		utils.HandleHttpError(err, w)
+	authData := r.Context().Value(middleware.AuthorizationContextKey{}).(*middleware.AuthorizationData)
+	if authData.AccessToken == "" {
+		utils.HandleHttpError(fmt.Errorf("unauthorized"), w)
 		return
 	}
 
-	jwtContent := jwtCookie.Value
-
-	isValid, jwtClaims, err := utils.ValidateJwtToken(jwtContent)
-	if !isValid {
-		utils.HandleHttpError(err, w)
-		return
-	}
-
-	userId := jwtClaims.UserId
-
-	accessToken := r.Header.Get("Authorization")
-	userIdUuid, err := uuid.Parse(userId)
-
-	if err != nil {
-		utils.HandleHttpError(err, w)
-		return
-	}
-
-	user, err := repository.FindUserById(config.DB, userIdUuid)
+	user, err := repository.FindUserById(config.DB, authData.UserId)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return
@@ -50,7 +31,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	stravaRequestUri := fmt.Sprintf("https://www.strava.com/api/v3/athletes/%d/stats", stravaId)
 
 	request, err := http.NewRequest(http.MethodGet, stravaRequestUri, nil)
-	request.Header.Add("Authorization", accessToken)
+	request.Header.Add("Authorization", authData.AccessToken)
 	if err != nil {
 		utils.HandleHttpError(err, w)
 		return
