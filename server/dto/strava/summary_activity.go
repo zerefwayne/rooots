@@ -34,3 +34,5 @@ type SummaryActivity struct {
 	AverageSpeed       float64     `json:"average_speed,omitempty"`
 	MaxSpeed           float64     `json:"max_speed,omitempty"`
 }
+
+type SummaryActivityList []SummaryActivity
