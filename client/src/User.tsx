@@ -11,12 +11,9 @@ const User = () => {
         let isMounted = true;
         const controller = new AbortController();
 
-        const userId = auth?.userId;
-        console.log(userId);
-
         const getUser = async () => {
             try {
-                const response = await axiosPrivate.get(`/strava/${userId}/user`, { signal: controller.signal });
+                const response = await axiosPrivate.get(`/strava/user`, { signal: controller.signal });
                 console.log(response.data);
 
                 isMounted && setUser(response.data);
@@ -25,7 +22,7 @@ const User = () => {
             }
         }
 
-        if (userId) {
+        if (auth?.accessToken) {
             getUser();
         }
 
