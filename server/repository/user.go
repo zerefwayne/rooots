@@ -3,6 +3,7 @@ package repository
 import (
 	"github.com/google/uuid"
 	strava "github.com/zerefwayne/rooots/server/dto/strava"
+	"github.com/zerefwayne/rooots/server/mappers"
 	"github.com/zerefwayne/rooots/server/models"
 	"gorm.io/gorm"
 )
@@ -30,20 +31,17 @@ func FindUserByStravaId(DB *gorm.DB, id uint64) (*models.User, error) {
 }
 
 func CreateUserByStravaLogin(DB *gorm.DB, exchangeTokenBody *strava.ExchangeTokenResponseBody) (*models.User, error) {
-	newUser := models.User{
-		Id:           uuid.New(),
-		StravaId:     exchangeTokenBody.Athlete.Id,
-		FirstName:    exchangeTokenBody.Athlete.FirstName,
-		LastName:     exchangeTokenBody.Athlete.LastName,
-		RefreshToken: exchangeTokenBody.RefreshToken,
-	}
+	newUser := mappers.MapSummaryAthleteToUser(&exchangeTokenBody.Athlete)
 
-	result := DB.Model(&models.User{}).Create(&newUser)
+	newUser.Id = uuid.New()
+	newUser.RefreshToken = exchangeTokenBody.RefreshToken
+
+	result := DB.Model(&models.User{}).Create(newUser)
 	if result.Error != nil {
 		return nil, result.Error
 	}
 
-	return &newUser, nil
+	return newUser, nil
 }
 
 func FindOrCreateUserByStrava(DB *gorm.DB, exchangeTokenBody *strava.ExchangeTokenResponseBody) (*models.User, error) {
