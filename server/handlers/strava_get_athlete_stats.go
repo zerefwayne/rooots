@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/google/uuid"
-	"github.com/gorilla/mux"
 	"github.com/zerefwayne/rooots/server/config"
 	"github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/repository"
@@ -15,13 +14,33 @@ import (
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
+	jwtCookie, err := r.Cookie(config.REFRESH_TOKEN_COOKIE_NAME)
+	if err != nil {
+		utils.HandleHttpError(err, w)
+		return
+	}
+
+	jwtContent := jwtCookie.Value
+
+	isValid, jwtClaims, err := utils.ValidateJwtToken(jwtContent)
+	if !isValid {
+		utils.HandleHttpError(err, w)
+		return
+	}
+
+	userId := jwtClaims.UserId
+
 	accessToken := r.Header.Get("Authorization")
-	vars := mux.Vars(r)
-	userId := vars["id"]
+	// vars := mux.Vars(r)
+	// userId := vars["id"]
 	userIdUuid, err := uuid.Parse(userId)
 
-	if err != nil || accessToken == "" || userId == "" {
-		w.WriteHeader(http.StatusUnauthorized)
+	// if err != nil || accessToken == "" || userId == "" {
+	// 	w.WriteHeader(http.StatusUnauthorized)
+	// 	return
+	// }
+	if err != nil {
+		utils.HandleHttpError(err, w)
 		return
 	}
 

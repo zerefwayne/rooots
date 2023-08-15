@@ -60,7 +60,13 @@ func ExchangeTokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	newCookie := utils.GetCookie(config.REFRESH_TOKEN_COOKIE_NAME, exchangeTokenBody.RefreshToken, time.Unix(exchangeTokenBody.ExpiresAt, 0))
+	cookieContent, err := utils.GenerateJwtToken(&utils.SessionJwt{RefreshToken: exchangeTokenBody.RefreshToken, UserId: user.Id.String()})
+	if err != nil {
+		utils.HandleHttpError(err, w)
+		return
+	}
+
+	newCookie := utils.GetCookie(config.REFRESH_TOKEN_COOKIE_NAME, cookieContent, time.Unix(exchangeTokenBody.ExpiresAt, 0))
 	http.SetCookie(w, newCookie)
 
 	loginResponse := strava.LoginSuccessResponse{
