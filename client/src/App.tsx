@@ -1,10 +1,11 @@
 import { Route, Routes } from 'react-router-dom';
 import AppLayout from "./AppLayout";
+import AppNavLayout from './AppNavLayout';
+import Home from './Home';
 import Login from './Login';
 import StravaLoading from './StravaCallback';
-import RequireAuth from './components/RequireAuth';
-import Home from './Home';
 import PersistentLogin from './components/PersistLogin';
+import RequireAuth from './components/RequireAuth';
 
 const App = () => {
     return (
@@ -15,9 +16,11 @@ const App = () => {
 
                 <Route element={<PersistentLogin />}>
                     <Route element={<RequireAuth />}>
-                        <Route path="" element={<Home />} />
+                            <Route path="" element={<AppNavLayout />}>
+                                <Route path="" element={<Home />} />
+                            </Route>
+                        </Route>
                     </Route>
-                </Route>
             </Route>
         </Routes>
     )

@@ -1,12 +1,9 @@
 import { useEffect, useState } from "react";
-import useRefreshToken from "./hooks/useRefreshToken";
-import { Button } from "antd";
-import useAxiosPrivate from "./hooks/useAxiosPrivate";
 import useAuth from "./hooks/useAuth";
+import useAxiosPrivate from "./hooks/useAxiosPrivate";
 
 const User = () => {
     const [user, setUser] = useState();
-    const refreshToken = useRefreshToken();
     const axiosPrivate = useAxiosPrivate();
     const { auth } = useAuth();
 
@@ -47,7 +44,6 @@ const User = () => {
             <p>
                 {user === null && <h1>No user available</h1>}
             </p>
-            <Button type="primary" onClick={() => refreshToken()}>Refresh Token</Button>
         </article>
     )
 };
