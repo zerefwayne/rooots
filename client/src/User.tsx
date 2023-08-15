@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import useAuth from "./hooks/useAuth";
 import useAxiosPrivate from "./hooks/useAxiosPrivate";
-import { Alert, Button } from "antd";
+import { Alert, Button, Layout } from "antd";
 import { useNavigate } from "react-router-dom";
 import useLogout from "./hooks/useLogout";
+import { Content } from "antd/es/layout/layout";
 
 const User = () => {
     const [user, setUser] = useState();
@@ -20,8 +21,6 @@ const User = () => {
     useEffect(() => {
         let isMounted = true;
         const controller = new AbortController();
-
-
 
         const getUser = async () => {
             try {
@@ -45,22 +44,24 @@ const User = () => {
     }, []);
 
     return (
-        <>
-            <Alert
-                description="Page under construction"
-                type="warning"
-                showIcon
-                closable
-            />
-            <h2>User</h2>
-            <p>
-                {JSON.stringify(user)}
-            </p>
-            <p>
-                {user === null && <h1>No user available</h1>}
-            </p>
-            <Button onClick={handleLogout}>Logout</Button>
-        </>
+        <Layout>
+            <Content>
+                <Alert
+                    description="Page under construction"
+                    type="warning"
+                    showIcon
+                    closable
+                />
+                <h2>User</h2>
+                <p>
+                    {JSON.stringify(user)}
+                </p>
+                <p>
+                    {user === null && <h1>No user available</h1>}
+                </p>
+                <Button onClick={handleLogout}>Logout</Button>
+            </Content>
+        </Layout>
     )
 };
 
