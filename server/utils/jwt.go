@@ -2,11 +2,12 @@ package utils
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var mySigningKey = []byte("AllYourBase")
+var mySigningKey = []byte(os.Getenv("JWT_SIGNING_KEY"))
 
 type SessionJwt struct {
 	RefreshToken string `json:"refresh_token"`
