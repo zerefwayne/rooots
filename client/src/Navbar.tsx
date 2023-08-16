@@ -33,12 +33,14 @@ const Navbar = () => {
             position: 'sticky',
             top: 0,
             zIndex: 1,
-            height: '3rem',
+            height: '5vh',
             width: '100%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between'
-        }}>
+        }}
+        
+        >
             {isLoading ? "Loading" : (
                 <>
                     <Button

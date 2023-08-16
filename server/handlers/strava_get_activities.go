@@ -12,7 +12,7 @@ import (
 func GetActivities(w http.ResponseWriter, r *http.Request) {
 	authData := r.Context().Value(middleware.AuthorizationContextKey{}).(*middleware.AuthorizationData)
 
-	stravaRequestUri := "https://www.strava.com/api/v3/athlete/activities"
+	stravaRequestUri := "https://www.strava.com/api/v3/athlete/activities?per_page=100"
 	request, err := http.NewRequest(http.MethodGet, stravaRequestUri, nil)
 	if err != nil {
 		utils.HandleHttpError(err, w)

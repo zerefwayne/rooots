@@ -1,4 +1,5 @@
-import { Layout } from "antd";
+import { EyeTwoTone } from '@ant-design/icons';
+import { Button, Layout, List } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { Content } from "antd/es/layout/layout";
 import { useEffect, useState } from "react";
@@ -8,7 +9,9 @@ const siderStyle: React.CSSProperties = {
     lineHeight: '120px',
     color: '#fff',
     backgroundColor: '#000B15',
-    padding: 0
+    overflowY: 'scroll',
+    padding: '1em',
+    display: 'block'
 };
 
 const Dashboard = () => {
@@ -32,19 +35,31 @@ const Dashboard = () => {
     }, []);
 
     return (
-        isLoading
-            ? <p>Loading</p>
-            : (
-                <Layout style={{ height: "93.95vh" }}>
-                    <Content />
-                    <Sider style={siderStyle} width={300}>
-                        <h3 style={{ margin: '1em 0', lineHeight: '24px', textAlign: 'center' }}>Activities</h3>
-                        <ul>
-                            {activities.length > 0 && activities.map((activity: any) => (<li style={{lineHeight: '24px'}}>{activity?.name}</li>))}
-                        </ul>
-                    </Sider>
-                </Layout>
-            )
+        <Layout style={{ height: "95vh" }}>
+            <Content style={{backgroundColor: '#111'}}>
+                </Content>
+            <Sider style={siderStyle} width={350}>
+                {isLoading ? (<p>Loading activities</p>) : (<>
+                    <h3 style={{ margin: '1em 0', lineHeight: '24px', textAlign: 'center' }}>Activities</h3>
+                    <List
+                        size="small"
+                        dataSource={activities}
+                        style={{ marginBottom: '1em' }}
+                        bordered
+                        renderItem={
+                            (item: any) => (
+                                <List.Item
+                                    style={{ color: 'white', borderBottom: '0.5px solid #333', display: 'flex', justifyContent: 'space-between' }}>
+                                    <p style={{ margin: 0 }}>{item?.name}</p>
+                                    <Button size="small" shape="circle" icon={<EyeTwoTone />} />
+                                </List.Item>
+                            )
+                        }
+                    />
+                </>
+                )}
+            </Sider>
+        </Layout >
     )
 
 }
