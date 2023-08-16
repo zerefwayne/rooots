@@ -2,17 +2,21 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/zerefwayne/rooots/server/dto/strava"
 	"github.com/zerefwayne/rooots/server/middleware"
 	"github.com/zerefwayne/rooots/server/utils"
 )
 
-func GetActivities(w http.ResponseWriter, r *http.Request) {
+func GetActivity(w http.ResponseWriter, r *http.Request) {
 	authData := r.Context().Value(middleware.AuthorizationContextKey{}).(*middleware.AuthorizationData)
 
-	stravaRequestUri := "https://www.strava.com/api/v3/athlete/activities?per_page=100"
+	activityId := mux.Vars(r)["activityId"]
+
+	stravaRequestUri := fmt.Sprintf("https://www.strava.com/api/v3/activities/%s}", activityId)
 	request, err := http.NewRequest(http.MethodGet, stravaRequestUri, nil)
 	if err != nil {
 		utils.HandleHttpError(err, w)
@@ -29,7 +33,7 @@ func GetActivities(w http.ResponseWriter, r *http.Request) {
 	}
 	defer resp.Body.Close()
 
-	responseObject := make(strava.SummaryActivityList, 0)
+	var responseObject strava.SummaryActivity
 
 	err = utils.DecodeJson(resp.Body, &responseObject)
 	if err != nil {

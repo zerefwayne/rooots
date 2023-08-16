@@ -8,9 +8,15 @@ import (
 	"time"
 )
 
-func HandleHttpError(err error, w http.ResponseWriter) {
+func HandleHttpError(err error, w http.ResponseWriter, args ...int) {
+	defaultStatusCode := http.StatusInternalServerError
+
+	if len(args) > 0 {
+		defaultStatusCode = args[0]
+	}
+
 	fmt.Println("Error: ", err.Error())
-	http.Error(w, err.Error(), http.StatusBadRequest)
+	http.Error(w, err.Error(), defaultStatusCode)
 }
 
 func GetCookie(name string, value string, expires time.Time) *http.Cookie {

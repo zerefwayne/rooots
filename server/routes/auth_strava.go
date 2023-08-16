@@ -15,6 +15,7 @@ func LoadStravaAuthRoutes(r *mux.Router) {
 func LoadStravaApiRoutes(r *mux.Router) {
 	r.HandleFunc("/strava/user", middleware.Authorize(handlers.GetUser)).Methods("GET")
 	r.HandleFunc("/strava/activities", middleware.Authorize(handlers.GetActivities)).Methods("GET")
+	r.HandleFunc("/strava/activities/{activityId}", middleware.Authorize(handlers.GetActivity)).Methods("GET")
 }
 
 func LoadAuthRoutes(r *mux.Router) {

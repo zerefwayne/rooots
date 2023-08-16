@@ -30,8 +30,8 @@ func RefreshTokenHandler(w http.ResponseWriter, r *http.Request) {
 	stravaRefreshTokenUri := getStravaRefreshTokenUri(authData.RefreshToken)
 
 	request, err := http.Post(stravaRefreshTokenUri, "application/json", nil)
-	if err != nil {
-		utils.HandleHttpError(err, w)
+	if err != nil || request.StatusCode != http.StatusOK {
+		utils.HandleHttpError(err, w, request.StatusCode)
 		return
 	}
 	defer request.Body.Close()
