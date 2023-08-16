@@ -2,8 +2,9 @@ import { EyeTwoTone } from '@ant-design/icons';
 import { Button, Layout, List } from "antd";
 import Sider from "antd/es/layout/Sider";
 import { Content } from "antd/es/layout/layout";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import useAxiosPrivate from "./hooks/useAxiosPrivate";
+import mapboxgl from "mapbox-gl";
 
 const siderStyle: React.CSSProperties = {
     lineHeight: '120px',
@@ -18,6 +19,16 @@ const Dashboard = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const axiosPrivate = useAxiosPrivate();
     const [activities, setActivities] = useState([]);
+
+    mapboxgl.accessToken =
+        "pk.eyJ1IjoiemVyZWZ3YXluZSIsImEiOiJjbGtwcHZ6bTQwOWx5M3B1azB6bmhvN21kIn0.GeFYwb8ZhwGvi8l1ENtHnA";
+
+    const mapContainer = useRef<any>(null);
+    const map = useRef<any>(null);
+
+    const [lat, setLat] = useState(46.2271);
+    const [lng, setLng] = useState(6.5982);
+    const [zoom, setZoom] = useState(7.5);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -34,10 +45,32 @@ const Dashboard = () => {
         fetchUser();
     }, []);
 
+    useEffect(() => {
+        if (map.current) return;
+
+        map.current = new mapboxgl.Map({
+            container: mapContainer.current,
+            style: "mapbox://styles/mapbox/dark-v11",
+            center: [lng, lat],
+            zoom: zoom,
+        });
+    });
+
+    useEffect(() => {
+        if (!map.current) return;
+
+        map.current.on("move", () => {
+            setLng(map.current.getCenter().lng.toFixed(4));
+            setLat(map.current.getCenter().lat.toFixed(4));
+            setZoom(map.current.getZoom().toFixed(2));
+        });
+    });
+
     return (
         <Layout style={{ height: "95vh" }}>
-            <Content style={{backgroundColor: '#111'}}>
-                </Content>
+            <Content style={{ backgroundColor: 'red' }}>
+                <div ref={mapContainer} className="map-container" style={{ height: '95vh' }} />
+            </Content>
             <Sider style={siderStyle} width={350}>
                 {isLoading ? (<p>Loading activities</p>) : (<>
                     <h3 style={{ margin: '1em 0', lineHeight: '24px', textAlign: 'center' }}>Activities</h3>
