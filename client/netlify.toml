@@ -1,6 +1,6 @@
 [[redirects]]
   from = "/api/*"
-  to = "https://frozen-cliffs-08486-11d88b13a69e.herokuapp.com/:splat"
+  to = "https://frozen-cliffs-08486-11d88b13a69e.herokuapp.com/api/:splat"
   status = 200
 
 [[redirects]]
