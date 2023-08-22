@@ -22,25 +22,35 @@ func HandleHttpError(err error, w http.ResponseWriter, args ...int) {
 }
 
 func GetCookie(name string, value string, expires time.Time) *http.Cookie {
+	sameSiteMode := http.SameSiteLaxMode
+	if config.IsEnvironmentHeroku() {
+		sameSiteMode = http.SameSiteNoneMode
+	}
+
 	return &http.Cookie{
 		Name:     name,
 		Value:    value,
 		Expires:  expires,
 		Secure:   config.IsEnvironmentHeroku(),
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: sameSiteMode,
 		Path:     "/",
 	}
 }
 
 func RemoveCookie(cookie *http.Cookie) *http.Cookie {
+	sameSiteMode := http.SameSiteLaxMode
+	if config.IsEnvironmentHeroku() {
+		sameSiteMode = http.SameSiteNoneMode
+	}
+
 	return &http.Cookie{
 		Name:     cookie.Name,
 		Value:    cookie.Name,
 		MaxAge:   -1,
 		Secure:   config.IsEnvironmentHeroku(),
 		HttpOnly: true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: sameSiteMode,
 		Path:     "/",
 	}
 }
