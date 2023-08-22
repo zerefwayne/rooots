@@ -20,9 +20,14 @@ func getDatabaseConnectionURL() string {
 	user := os.Getenv("DB_POSTGRESQL_USER")
 	password := os.Getenv("DB_POSTGRESQL_PASSWORD")
 	dbname := os.Getenv("DB_POSTGRESQL_DATABASE")
+	sslmode := "disable"
 
-	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+	if IsEnvironmentHeroku() {
+		sslmode = "require"
+	}
+
+	return fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
+		host, port, user, password, dbname, sslmode)
 }
 
 func ConnectDB() {

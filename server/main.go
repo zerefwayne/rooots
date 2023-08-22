@@ -23,6 +23,11 @@ func main() {
 	handler := routes.NewCorsConfiguration().Handler(r)
 
 	port := fmt.Sprintf(":%s", os.Getenv("APPLICATION_PORT"))
+
+	if config.IsEnvironmentHeroku() {
+		port = fmt.Sprintf(":%s", os.Getenv("PORT"))
+	}
+
 	log.Printf("server	listening on port %s\n", port)
 	if err := http.ListenAndServe(port, handler); err != nil {
 		log.Fatalln(err)
