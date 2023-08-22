@@ -6,6 +6,8 @@ import (
 	"io"
 	"net/http"
 	"time"
+
+	"github.com/zerefwayne/rooots/server/config"
 )
 
 func HandleHttpError(err error, w http.ResponseWriter, args ...int) {
@@ -24,7 +26,7 @@ func GetCookie(name string, value string, expires time.Time) *http.Cookie {
 		Name:     name,
 		Value:    value,
 		Expires:  expires,
-		Secure:   false,
+		Secure:   config.IsEnvironmentHeroku(),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",
@@ -36,7 +38,7 @@ func RemoveCookie(cookie *http.Cookie) *http.Cookie {
 		Name:     cookie.Name,
 		Value:    cookie.Name,
 		MaxAge:   -1,
-		Secure:   false,
+		Secure:   config.IsEnvironmentHeroku(),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 		Path:     "/",
