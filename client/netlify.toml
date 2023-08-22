@@ -1,9 +1,9 @@
 [[redirects]]
+  from = "/api/*"
+  to = "https://frozen-cliffs-08486-11d88b13a69e.herokuapp.com/v1/:splat"
+  status = 200
+
+[[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
-
-[[headers]]
-  for = "/*"
-    [headers.values]
-    Access-Control-Allow-Origin = "*"
