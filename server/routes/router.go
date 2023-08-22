@@ -41,6 +41,8 @@ func NewRouter() *mux.Router {
 func NewCorsConfiguration() *cors.Cors {
 	CLIENT_URL := os.Getenv("CLIENT_URL")
 
+	log.Println(CLIENT_URL)
+
 	return cors.New(cors.Options{
 		AllowedOrigins: []string{CLIENT_URL},
 		AllowedMethods: []string{
