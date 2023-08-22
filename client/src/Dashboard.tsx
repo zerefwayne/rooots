@@ -4,7 +4,9 @@ import Sider from "antd/es/layout/Sider";
 import { Content } from "antd/es/layout/layout";
 import { useEffect, useRef, useState } from "react";
 import useAxiosPrivate from "./hooks/useAxiosPrivate";
+// eslint-disable-next-line import/no-webpack-loader-syntax
 import mapboxgl from "mapbox-gl";
+import "mapbox-gl/dist/mapbox-gl.css";
 import polyline from '@mapbox/polyline';
 
 const siderStyle: React.CSSProperties = {
